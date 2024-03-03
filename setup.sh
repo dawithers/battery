@@ -14,7 +14,6 @@ mkdir -p $tempfolder
 # Set script value
 calling_user=${1:-"$USER"}
 configfolder=/Users/$calling_user/.battery
-pidfile=$configfolder/battery.pid
 logfile=$configfolder/battery.log
 
 
@@ -29,18 +28,22 @@ batteryfolder="$tempfolder/battery"
 echo "[ 2 ] Downloading latest version of battery CLI"
 rm -rf $batteryfolder
 mkdir -p $batteryfolder
-curl -sSL -o $batteryfolder/repo.zip "https://github.com/actuallymentor/battery/archive/refs/heads/$update_branch.zip"
+curl -sSL -o $batteryfolder/repo.zip "https://github.com/dawithers/battery/archive/refs/heads/$update_branch.zip"
 unzip -qq $batteryfolder/repo.zip -d $batteryfolder
 cp -r $batteryfolder/$in_zip_folder_name/* $batteryfolder
 rm $batteryfolder/repo.zip
 
-# Move built file to bin folder
+# Move built files to bin folder
 echo "[ 3 ] Move smc to executable folder"
 sudo mkdir -p $binfolder
-sudo cp $batteryfolder/dist/smc $binfolder
+sudo cp $batteryfolder/dist/smc/smc $binfolder
 sudo chown $calling_user $binfolder/smc
 sudo chmod 755 $binfolder/smc
 sudo chmod +x $binfolder/smc
+sudo cp $batteryfolder/dist/bclm/bclm $binfolder
+sudo chown $calling_user $binfolder/bclm
+sudo chmod 755 $binfolder/bclm
+sudo chmod +x $binfolder/bclm
 
 echo "[ 4 ] Writing script to $binfolder/battery for user $calling_user"
 sudo cp $batteryfolder/battery.sh $binfolder/battery
@@ -59,18 +62,17 @@ touch $logfile
 sudo chown $calling_user $logfile
 sudo chmod 755 $logfile
 
-touch $pidfile
-sudo chown $calling_user $pidfile
-sudo chmod 755 $pidfile
-
 sudo chown $calling_user $binfolder/battery
 
 echo "[ 6 ] Setting up visudo declarations"
-sudo bash $batteryfolder/battery.sh visudo
+sudo bash $binfolder/battery visudo
+
+echo "[ 7 ] Setting up persistence file"
+sudo $binfolder/bclm persist
 
 # Remove tempfiles
 cd ../..
-echo "[ 7 ] Removing temp folder $tempfolder"
+echo "[ 8 ] Removing temp folder $tempfolder"
 rm -rf $tempfolder
 
 echo -e "\n🎉 Battery tool installed. Type \"battery help\" for instructions.\n"

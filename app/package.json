@@ -1,6 +1,6 @@
 {
   "name": "battery",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "A battery charge limiter for Apple silicon Mac devices",
   "main": "main.js",
   "build": {
@@ -16,13 +16,6 @@
       "filter": [
         "**/*"
       ]
-    },
-    "afterSign": "./build_hooks/afterSign.js",
-    "mac": {
-      "hardenedRuntime": true,
-      "gatekeeperAssess": false,
-      "entitlements": "build/entitlements.mac.plist",
-      "entitlementsInherit": "build/entitlements.mac.plist"
     }
   },
   "scripts": {
@@ -32,13 +25,13 @@
     "prepare": "cd .. && husky install ./app/.husky",
     "lint": "eslint --fix modules main.js"
   },
-  "repository": "https://github.com/actuallymentor/battery",
+  "repository": "https://github.com/dawithers/battery",
   "keywords": [
     "battery",
     "m1",
     "mac"
   ],
-  "author": "actuallymentor",
+  "author": "dawithers",
   "license": "MIT",
   "devDependencies": {
     "@babel/eslint-parser": "^7.19.1",

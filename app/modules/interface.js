@@ -2,7 +2,6 @@ const { shell, app, Tray, Menu, powerMonitor, nativeTheme } = require( 'electron
 const { enable_battery_limiter, disable_battery_limiter, initialize_battery, is_limiter_enabled, get_battery_status, uninstall_battery } = require( './battery' )
 const { log } = require( "./helpers" )
 const { get_logo_template } = require( './theme' )
-const { get_force_discharge_setting, update_force_discharge_setting } = require( './settings' )
 
 /* ///////////////////////////////
 // Menu helpers
@@ -20,24 +19,21 @@ const generate_app_menu = async () => {
         // Check if limiter is on
         const limiter_on = await is_limiter_enabled()
 
-        // Check force discharge setting
-        const allow_discharge = get_force_discharge_setting()
-
         // Set tray icon
-        log( `Generate app menu percentage: ${ percentage } (discharge ${ allow_discharge ? 'allowed' : 'disallowed' }, limited ${ limiter_on ? 'on' : 'off' })` )
+        log( `Generate app menu percentage: ${ percentage } (limited ${ limiter_on ? 'on' : 'off' })` )
         tray.setImage( get_logo_template( percentage, limiter_on ) )
 
         // Build menu
         return Menu.buildFromTemplate( [
 
             {
-                label: `Enable ${ maintain_percentage }% battery limit`,
+                label: `Enable 80% battery limit`,
                 type: 'radio',
                 checked: limiter_on,
                 click: enable_limiter
             },
             {
-                label: `Disable ${ maintain_percentage }% battery limit`,
+                label: `Disable 80% battery limit`,
                 type: 'radio',
                 checked: !limiter_on,
                 click: disable_limiter
@@ -57,25 +53,11 @@ const generate_app_menu = async () => {
                 type: 'separator'
             },
             {
-                label: `Advanced settings`,
-                submenu: [
-                    {
-                        label: `Allow force-discharging`,
-                        type: 'checkbox',
-                        checked: allow_discharge,
-                        click: async () => {
-                            const success = await update_force_discharge_setting()
-                            if( limiter_on && success ) await restart_limiter()
-                        }
-                    }
-                ]
-            },
-            {
                 label: `About v${ app.getVersion() }`,
                 submenu: [
                     {
                         label: `Check for updates`,
-                        click: () => shell.openExternal( `https://github.com/actuallymentor/battery/releases` )
+                        click: () => shell.openExternal( `https://github.com/dawithers/battery/releases` )
                     },
                     {
                         type: 'normal',
@@ -92,17 +74,17 @@ const generate_app_menu = async () => {
                     },
                     {
                         label: `User manual`,
-                        click: () => shell.openExternal( `https://github.com/actuallymentor/battery#readme` )
+                        click: () => shell.openExternal( `https://github.com/dawithers/battery#readme` )
                     },
                     {
                         type: 'normal',
                         label: 'Command-line usage',
-                        click: () => shell.openExternal( `https://github.com/actuallymentor/battery#-command-line-version` )
+                        click: () => shell.openExternal( `https://github.com/dawithers/battery#-command-line-version` )
                     },
                     {
                         type: 'normal',
                         label: 'Help and feature requests',
-                        click: () => shell.openExternal( `https://github.com/actuallymentor/battery/issues` )
+                        click: () => shell.openExternal( `https://github.com/dawithers/battery/issues` )
                     }
                 ]
             },
@@ -173,7 +155,7 @@ const refresh_logo = async ( percent=80, force ) => {
 
 
 /* ///////////////////////////////
-// Initialisation
+// Initialization
 // /////////////////////////////*/
 async function set_initial_interface() {
 
@@ -187,10 +169,7 @@ async function set_initial_interface() {
 
     log( "Triggering boot-time auto-update" )
     await initialize_battery()
-    log( "App initialisation process complete" )
-
-    // Start battery handler
-    await enable_battery_limiter()
+    log( "App initialization process complete" )
 
     // Set tray styles
     tray.setTitle( '' )
