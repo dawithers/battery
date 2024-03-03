@@ -107,6 +107,10 @@ Usage:
     block power input from the adapter until battery falls to this level
     eg: battery discharge 75
 
+  battery calibrate
+    runs a 100%-10%-100% calibration cycle and waits an hour before returning to maintenance mode
+    eg: battery calibrate
+
   battery visudo
     ensure you don't need to call battery with sudo
     this is already used in the setup script, so you should't need it.

@@ -70,6 +70,10 @@ Usage:
     block power input from the adapter until battery falls to this level
     eg: battery discharge 75
 
+  battery calibrate
+    runs a 100%-10%-100% calibration cycle and waits an hour before returning to maintenance mode
+    eg: battery calibrate
+
   battery visudo
     ensure you don't need to call battery with sudo
     this is already used in the setup script, so you should't need it.
@@ -452,6 +456,26 @@ if [[ "$action" == "maintain" ]]; then
 	fi
 
 	exit 0
+
+fi
+
+# Run calibration cycle
+if [[ "$action" == "calibrate" ]]; then
+
+	battery_percentage=$(get_battery_percentage)
+	log "Calibrating $battery_percentage%->100%->0%->100% (this will take some time)"
+	battery charge 100
+
+	log "Pausing at 100% for two hours"
+	caffeinate -is sleep 7200
+
+	battery discharge 0
+	battery charge 100
+
+	log "Pausing at 100% for two hours"
+	caffeinate -is sleep 7200
+
+	log "Calibration completed"
 
 fi
 
